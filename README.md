@@ -6,6 +6,8 @@ python3.7, pandas, xlrd, graphviz
 
 ## Usage
 
+cd src
+
 python3.7 vrp.py input_file [output_file] [time_limit] [nb_trucks] [truck_capacity]
 
 ## Results
