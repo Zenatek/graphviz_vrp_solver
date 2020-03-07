@@ -2,7 +2,7 @@
 
 ### Dipendenze
 
-python3.7, pandas, xlrd, graphviz
+python3.7, localsolver, pandas, xlrd, graphviz
 
 ## Usage
 
