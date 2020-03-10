@@ -12,7 +12,6 @@ from read_excel import *
 from results import *
 from drawGraph import *
 
-
 def read_elem(filename):
     with open(filename) as f:
         return [str(elem) for elem in f.read().split()]
@@ -21,10 +20,13 @@ def read_elem(filename):
 def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity):
     nb_trucks = int(str_nb_trucks)
     mapIndex = {}
+
+    #route_distances = [None for n in range(nb_trucks)]
+    sequence = []
     #
     # Reads instance data
     #
-    (nb_customers, truck_capacity, distance_matrix, distance_warehouses, demands, mapIndex) = read_excel(instance_file, mapIndex, int(truck_capacity))
+    (nb_customers, truck_capacity, distance_matrix, distance_warehouses, dist_warehouses, demands, mapIndex, timePV, time_wh_to_pv, pv_for_time) = read_excel(instance_file, mapIndex, int(truck_capacity))
     # The number of trucks is usually given in the name of the file
     # nb_trucks can also be given in command line
 
@@ -54,12 +56,13 @@ def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity)
 
         distance_warehouse_array = model.array(distance_warehouses)
 
-        route_distances = [None for n in range(nb_trucks)]
+        route_distances = [None for n in range(nb_trucks)]                                     #
 
         # A truck is used if it visits at least one customer
         trucks_used = [(model.count(customers_sequences[k]) > 0) for k in range(nb_trucks)]
         nb_trucks_used = model.sum(trucks_used)
 
+        #for k in range(nb_trucks):
         for k in range(nb_trucks):
             sequence = customers_sequences[k]
             c = model.count(sequence)
@@ -73,14 +76,18 @@ def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity)
             dist_selector = model.function(lambda i: model.at(distance_array, sequence[i-1], sequence[i]))
             route_distances[k] = model.sum(model.range(1,c), dist_selector) + \
                  model.iif(c > 0, model.at(distance_warehouse_array, sequence[0]) + model.at(distance_warehouse_array, sequence[c-1]),0)                       
-       
+            
+            
+            #model.minimize(route_distances[k])
         # Total distance travelled
         total_distance = model.sum(route_distances)
+        #print(route_distances.get_value())
+
 
         # Objective: minimize the number of trucks used, then minimize the distance travelled
         model.minimize(nb_trucks_used)
         model.minimize(total_distance)
-
+        
         model.close()
 
         #
@@ -90,11 +97,13 @@ def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity)
 
         ls.solve()
 
+
         #
         # Writes the solution in a file with the following format:
         #  - number of trucks used and total distance
         #  - for each truck the nodes visited (omitting the start/end at the depot)
         #
+
         if len(sys.argv) >= 3:
             with open("../results/" + sol_file, 'w') as f:
                 f.write("%d %d\n" % (nb_trucks_used.value, total_distance.value))
@@ -105,12 +114,64 @@ def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity)
                     for customer in customers_sequences[k].value:
                         f.write("%d " % (customer + 2))
                     f.write("\n")
+    
+    add_time = []
+    add_time_temp = []
+    sum_time = 0
+    sum_time_route = []
+    sum_dist = 0
+    sum_dist_route = []
+    with open("../results/" + sol_file, "r") as fd:
+        for line in fd:
+            add_time.append(line)
+        fd.close()
 
+    for n, el in enumerate(add_time):
+        if(n != 0):
+            add_time_temp = el.split(" ")
+            for k, elem in enumerate(add_time_temp):
+                if(elem != "\n"):
+                    if (k > 0):
+                        #print(add_time_temp[k-1])
+                        #print(elem)
+                        #print(distance_matrix[ int(add_time_temp[k-1]) -2][int(elem) -2])
+                        sum_time += timePV[ int(add_time_temp[k-1]) -2][int(elem) -2]
+                        sum_dist += distance_matrix[ int(add_time_temp[k-1]) -2][int(elem) -2]
+            sum_time_route.append(sum_time)
+            sum_dist_route.append(sum_dist)
+            sum_time = 0
+            sum_dist = 0
+    
+
+    
     # Write solution as pv id.
     write_results(mapIndex, "../results/" + sol_file)
 
+    file_sol = []
+    with open("../results/" + sol_file, "r") as fd:
+        for line in fd:
+            file_sol.append(line)
+        fd.close()
+
+    tempList = []
+
+    for n, el in enumerate(file_sol):
+        if(n != 0):
+            tempList = el.split(" ")
+            initNode = tempList[0]
+            endNode = tempList[-2]
+            # Time
+            sum_time_route[n-1] += time_wh_to_pv[pv_for_time.index(int(initNode))]
+            sum_time_route[n-1] += time_wh_to_pv[pv_for_time.index(int(endNode))]
+            # Distance from/to depot
+            #print(pv_for_time.index(int(initNode)))
+            #print(dist_warehouses[pv_for_time.index(int(initNode))])
+            sum_dist_route[n-1] += dist_warehouses[pv_for_time.index(int(initNode))]
+            sum_dist_route[n-1] += dist_warehouses[pv_for_time.index(int(endNode))]
+
+
     # Draw graph of track's route
-    draw_graph("../results/" + sol_file, warehouse = "434")
+    draw_graph("../results/" + sol_file, sum_time_route, sum_dist_route, warehouse = "434")
 
 
 if __name__ == '__main__':

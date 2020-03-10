@@ -11,17 +11,17 @@ def read_excel(filename, mapIndex, truck_capacity):
     baseCarico = pd.read_excel(filename, sheet_name='BaseCarico')
     distMatrix = pd.read_excel(filename, sheet_name='MatriceDistanze')
     domandaGiorno = pd.read_excel(filename, sheet_name='DomandaGiorno18')
+
+    # Tempo da WH a PV
+    time_wh_to_pv = distWare["Tempo"].tolist()
+    pv_for_time = distWare["pv2"].tolist()
     
     # Definizione della quantità di pv
     nb_customers = len(pv["CodicePV"])
-
     customers = pv["CodicePV"].tolist()
 
     # Creazione della distance_warehouses
-    distance_warehouses = distWare["Distanza"].tolist()
-
-    # # Truck capacity
-    # truck_capacity = 39
+    dist_warehouses = distWare["Distanza"].tolist()
     
     # Demands
     demands = []
@@ -35,12 +35,17 @@ def read_excel(filename, mapIndex, truck_capacity):
         else:
             demands.append(0)
 
+
     # Distance_matrix
     pv1 = distMatrix["pv1"].tolist()
     pv2 = distMatrix["pv2"].tolist()
     distances_pv = distMatrix["Distanza"].tolist()
     distance_matrix = []
     temp = []
+    # Time_matrix
+    time_pv = distMatrix["Tempo"].tolist()
+    timePV = []
+    time = []
 
     # Trovo tutti gli indici dei pv1 della domanda giornaliera dentro la Matrice delle distanze
     index_pvDD = []
@@ -55,26 +60,36 @@ def read_excel(filename, mapIndex, truck_capacity):
         for h, v1 in enumerate(pvDD):
             for o, v2 in enumerate(pvDD):
                 for x, idx in enumerate(index_pvDD[j]):
-                    if(v1 == pv1[idx] and v2 == pv2[idx]):
+                    if(v1 == pv1[idx] and v2 == pv2[idx] and v1 != v2):
                         temp.append(distances_pv[idx])
-                    elif(v1 == v2):
-                        temp.append(0)
+                        time.append(time_pv[idx])
+
         distance_matrix.append(temp)
+        timePV.append(time)
         temp = []
+        time = []
+    
+    for n, el in enumerate(timePV):
+        timePV[n].insert(n,"0")
 
     # Elimino zeri e doppioni mantenendo l'ordine
     for j,dist in enumerate(distance_matrix):
-        distance_matrix[j] = list(dict.fromkeys(dist))
+        distance_matrix[j].insert(j,0)
     
     # for k,l in enumerate(distance_matrix):
     #     print (len(distance_matrix[k]))
+
+    # Creazione della distance_warehouses
+    distance_warehouses = []
+    for p in pvDD:
+        distance_warehouses.append(dist_warehouses[pv_for_time.index(p)])
 
     customers.insert(0,"434")
 
     for n, c in enumerate(customers):
         mapIndex[str(n + 1)] = str(c)
 
-    return (nb_customers, truck_capacity, distance_matrix, distance_warehouses, demands, mapIndex)
+    return (nb_customers, truck_capacity, distance_matrix, distance_warehouses, dist_warehouses, demands, mapIndex, timePV, time_wh_to_pv, pv_for_time)
             
 
 

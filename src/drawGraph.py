@@ -1,7 +1,7 @@
 from graphviz import Digraph
 import random
 
-def draw_graph(result_file, warehouse):
+def draw_graph(result_file, sum_time_route, sum_dist_route, warehouse):
     route = []
     fileX = []
     nbTruck = ""
@@ -22,7 +22,7 @@ def draw_graph(result_file, warehouse):
             for node in route:
                 dot.node(node,node, color=color)
             # draw fist edge. From warehouse to pv1
-            dot.edge(warehouse, route[0],color=color)
+            dot.edge(warehouse, route[0],color=color, label = str(round(sum_time_route[n_pv - 1]/60,2)) + "h" + "\n" + str(round(sum_dist_route[n_pv - 1],2)) + "km")
             # draw all edge 
             for n,node in enumerate(route):
                 if (n < len(route)-1):
