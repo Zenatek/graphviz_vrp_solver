@@ -17,16 +17,15 @@ def read_elem(filename):
         return [str(elem) for elem in f.read().split()]
 
 
-def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity):
+def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity, demands_for_day):
     nb_trucks = int(str_nb_trucks)
     mapIndex = {}
 
     #route_distances = [None for n in range(nb_trucks)]
-    sequence = []
     #
     # Reads instance data
     #
-    (nb_customers, truck_capacity, distance_matrix, distance_warehouses, dist_warehouses, demands, mapIndex, timePV, time_wh_to_pv, pv_for_time) = read_excel(instance_file, mapIndex, int(truck_capacity))
+    (nb_customers, truck_capacity, distance_matrix, distance_warehouses, dist_warehouses, demands, mapIndex, timePV, time_wh_to_pv, pv_for_time) = read_excel(instance_file, mapIndex, int(truck_capacity),demands_for_day)
     # The number of trucks is usually given in the name of the file
     # nb_trucks can also be given in command line
 
@@ -172,11 +171,17 @@ def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity)
 
     # Draw graph of track's route
     draw_graph("../results/" + sol_file, sum_time_route, sum_dist_route, warehouse = "434")
+    
+    # ll = 0
+    # for l in sum_dist_route:
+    #     ll += l
+    # print("Somma totale percorso: " + str(ll))
+    
 
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print ("Usage: python vrp.py input_file [output_file] [time_limit] [nb_trucks] [truck_capacity]")
+        print ("Usage: python vrp.py input_file [output_file] [time_limit] [nb_trucks] [truck_capacity] [demands_for_day]")
         sys.exit(1)
 
     instance_file = sys.argv[1];
@@ -184,8 +189,9 @@ if __name__ == '__main__':
     str_time_limit = sys.argv[3] if len(sys.argv) > 3 else "20";
     str_nb_trucks = sys.argv[4] if len(sys.argv) > 4 else "0";
     truck_capacity = sys.argv[5] if len(sys.argv) > 5 else "39";
+    demands_for_day = sys.argv[6] if len(sys.argv) > 6 else "DomandaGiorno18";
         
-    main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity)
+    main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity, demands_for_day)
 
 
 

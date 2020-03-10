@@ -5,12 +5,12 @@ from pandas import ExcelWriter
 from pandas import ExcelFile
 
 # File excel con le distanze e i punti vendita
-def read_excel(filename, mapIndex, truck_capacity):
-    pv = pd.read_excel(filename, sheet_name='DomandaGiorno18')
+def read_excel(filename, mapIndex, truck_capacity, demands_for_day):
+    pv = pd.read_excel(filename, sheet_name=demands_for_day)
     distWare = pd.read_excel(filename, sheet_name='DistanzaBase')
     baseCarico = pd.read_excel(filename, sheet_name='BaseCarico')
     distMatrix = pd.read_excel(filename, sheet_name='MatriceDistanze')
-    domandaGiorno = pd.read_excel(filename, sheet_name='DomandaGiorno18')
+    domandaGiorno = pd.read_excel(filename, sheet_name=demands_for_day)
 
     # Tempo da WH a PV
     time_wh_to_pv = distWare["Tempo"].tolist()
@@ -78,6 +78,8 @@ def read_excel(filename, mapIndex, truck_capacity):
     
     # for k,l in enumerate(distance_matrix):
     #     print (len(distance_matrix[k]))
+    # print("Lunghezza distance_matrix: " + str(len(distance_matrix)))
+    #print("Lunghezza dist: " + str(distance_matrix[-11]))
 
     # Creazione della distance_warehouses
     distance_warehouses = []
