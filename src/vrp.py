@@ -120,10 +120,14 @@ def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity,
     sum_time_route = []
     sum_dist = 0
     sum_dist_route = []
+    sumQTA = 0
+    sum_QTA_route = []
+
     with open("../results/" + sol_file, "r") as fd:
         for line in fd:
             add_time.append(line)
         fd.close()
+
 
     for n, el in enumerate(add_time):
         if(n != 0):
@@ -136,10 +140,13 @@ def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity,
                         #print(distance_matrix[ int(add_time_temp[k-1]) -2][int(elem) -2])
                         sum_time += timePV[ int(add_time_temp[k-1]) -2][int(elem) -2]
                         sum_dist += distance_matrix[ int(add_time_temp[k-1]) -2][int(elem) -2]
+                    sumQTA += demands[int(add_time_temp[k]) -2]
             sum_time_route.append(sum_time)
             sum_dist_route.append(sum_dist)
+            sum_QTA_route.append(sumQTA)
             sum_time = 0
             sum_dist = 0
+            sumQTA = 0
     
 
     
@@ -169,8 +176,9 @@ def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity,
             sum_dist_route[n-1] += dist_warehouses[pv_for_time.index(int(endNode))]
 
 
+
     # Draw graph of track's route
-    draw_graph("../results/" + sol_file, sum_time_route, sum_dist_route, warehouse = "434")
+    draw_graph("../results/" + sol_file, sum_time_route, sum_dist_route, sum_QTA_route, truck_capacity, warehouse = "434")
     
     # ll = 0
     # for l in sum_dist_route:

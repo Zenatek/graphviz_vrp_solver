@@ -1,14 +1,18 @@
 from graphviz import Digraph
 import random
+import datetime as dt
 
-def draw_graph(result_file, sum_time_route, sum_dist_route, warehouse):
+def draw_graph(result_file, sum_time_route, sum_dist_route, sum_QTA_route, truck_capacity, warehouse):
     route = []
     fileX = []
+    sum_Dist = 0
     nbTruck = ""
     total_distance = ""
     title = 'VRP solution'
     dot = Digraph(comment=title)
-    dot.node(warehouse, warehouse)
+    for p in sum_dist_route:
+        sum_Dist += p
+    dot.node(warehouse, warehouse, xlabel= "Truck capacity: " + str(truck_capacity) + "kl" + "\n" + "Total distance: " + str(round(sum_Dist,2)) + "km")
 
     with open(result_file, "r") as fd:
         for line in fd:
@@ -22,7 +26,7 @@ def draw_graph(result_file, sum_time_route, sum_dist_route, warehouse):
             for node in route:
                 dot.node(node,node, color=color)
             # draw fist edge. From warehouse to pv1
-            dot.edge(warehouse, route[0],color=color, label = str(round(sum_time_route[n_pv - 1]/60,2)) + "h" + "\n" + str(round(sum_dist_route[n_pv - 1],2)) + "km")
+            dot.edge(warehouse, route[0],color=color, label = str(dt.timedelta(minutes = sum_time_route[n_pv - 1])) + "\n" + str(round(sum_dist_route[n_pv - 1],2)) + "km" + "\n" + str(sum_QTA_route[n_pv-1]) + "kl")
             # draw all edge 
             for n,node in enumerate(route):
                 if (n < len(route)-1):
