@@ -6,7 +6,7 @@ La soluzione trovata viene visualizzata su un grafo colorato per ogni tratta uti
 ### Dipendenze
 
 ```
-python3.7, localsolver, pandas, xlrd, graphviz
+python3.7, localsolver version 9.0, pandas, xlrd, graphviz
 ```
 
 ## Usage
