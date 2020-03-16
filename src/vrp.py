@@ -93,8 +93,8 @@ def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity,
 
         #
         # Writes the solution in a file with the following format:
-        #  - number of trucks used and total distance
-        #  - for each truck the nodes visited (omitting the start/end at the depot)
+        #  - number of routes and total distance
+        #  - for each routes the nodes visited (omitting the start/end at the depot)
         #
 
         if len(sys.argv) >= 3:
