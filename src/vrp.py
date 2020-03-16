@@ -1,4 +1,4 @@
-########## cvrp.py ##########
+########## vrp.py ##########
 
 import localsolver
 import sys
@@ -20,8 +20,6 @@ def read_elem(filename):
 def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity, demands_for_day):
     nb_trucks = int(str_nb_trucks)
     mapIndex = {}
-
-    #route_distances = [None for n in range(nb_trucks)]
     #
     # Reads instance data
     #
@@ -76,8 +74,6 @@ def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity,
             route_distances[k] = model.sum(model.range(1,c), dist_selector) + \
                  model.iif(c > 0, model.at(distance_warehouse_array, sequence[0]) + model.at(distance_warehouse_array, sequence[c-1]),0)                       
             
-            
-            #model.minimize(route_distances[k])
         # Total distance travelled
         total_distance = model.sum(route_distances)
         #print(route_distances.get_value())
@@ -179,11 +175,6 @@ def main(instance_file, str_time_limit, sol_file, str_nb_trucks, truck_capacity,
 
     # Draw graph of track's route
     draw_graph("../results/" + sol_file, sum_time_route, sum_dist_route, sum_QTA_route, truck_capacity, warehouse = "434")
-    
-    # ll = 0
-    # for l in sum_dist_route:
-    #     ll += l
-    # print("Somma totale percorso: " + str(ll))
     
 
 
