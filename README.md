@@ -8,6 +8,7 @@ La soluzione trovata viene visualizzata su un grafo colorato per ogni tratta uti
 ```
 python3.7, localsolver version 9.0, pandas, xlrd, graphviz
 ```
+Se utilizzata una versione di localsolver >= 9.5 sarà necessario rinominare la funzione function() con lambda_function() in riga 70 e 75 del file vrp.py
 
 ## Usage
 
